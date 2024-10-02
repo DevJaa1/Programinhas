@@ -1,0 +1,4 @@
+A linha do 
+dataf  = pd.read_excel('C:/Users/joaom/OneDrive/Documentos/pp/DBFILMES.xlsx', engine='openpyxl')
+
+esta com um problema que de momento não estou conseguindo resolver, informa que o OpenPYXL não esta instalada no computador, mas esta tudo certo nos diretórios

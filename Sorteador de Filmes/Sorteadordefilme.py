@@ -1,31 +1,36 @@
-import random    # IMPORTA O SISTEMA DE ESCOLHAS ALEATORIAS
-import flet as ft  # IMPORTA A BIBLIOTECA DE INTERFACE GRÁFICA
-import pandas as pd # IMPORTA A BIBLIOTECA DE BANCO DE DADOS ULTILIZADA NESSE CÓDIGO
- 
+import random
+import flet as ft
+import pandas as pd
+import os
 
-# Carrega os dados do Excel
-dataf = pd.read_excel('C:/Users/joaom/OneDrive/Área de Trabalho/pp/DBFILMES.xlsx', engine='openpyxl')
+# Verifica se o arquivo existe
+caminho_arquivo = 'C:/Users/joaom/OneDrive/Documentos/pp/DBFILMES.xlsx'
+if not os.path.exists(caminho_arquivo):
+    print("O arquivo não foi encontrado.")
+    dataf = pd.DataFrame(columns=['filme'])  # Cria um DataFrame vazio
+else:
+    try:
+        dataf = pd.read_excel(caminho_arquivo, engine='openpyxl')
+    except Exception as e:
+        print(f"Erro ao carregar o arquivo Excel: {e}")
+        dataf = pd.DataFrame(columns=['filme'])  # Inicializa um DataFrame vazio se houver erro
 
-# FUNÇÃO QUE FAZ O SORTEIO DOS FILMES QUE FOREM ADICIONADOS NO ARQUIVO EXCEL
-
-def sorteio(e): # FUNÇÃO DE SORTEIO
-    if not dataf.empty: # SE O DATAFRAME NÃO ESTIVER VAZIO SIGINIFICA QUE ELE PODE SORTEAR O QUE TEM DENTRO 
-        escolhido = random.choice(dataf['filme'].tolist()) # SORTEAR O QUE TEM DENTRO DO DATAFRAME
-        resultado.value = f'O filme escolhido foi o: {escolhido}' # MOSTRA O QUE FOI SORTEADO DENTRO DO DATAFRAME
-        resultado.update() # ATUALIZA A VARIAVEL RESULTADO
-    else:
-        resultado.value = 'Nenhum filme disponível para sorteio' # CASO CONTRATIO SE O DATAFRAME ESTIVER VAZIO INFORMAR QUE NÃO EXISTE FILME PARA SER SORTEADO
+def sorteio(e):
+    if not dataf.empty:
+        escolhido = random.choice(dataf['filme'].tolist())
+        resultado.value = f'O filme escolhido foi o: {escolhido}'
         resultado.update()
-# -------------------------------------------------------------------------
+    else:
+        resultado.value = 'Nenhum filme disponível para sorteio'
+        resultado.update()
 
-
-def adcfilme(e): # FUNÇÃO PARA ADIOCIONAR FILME
-    global dataf # CHAMA A VARIAVEL DATAF (O DATAFRAME) PARA A FUNÇÃO ADCFILME
-    filmenovo = input_filme.value #
+def adcfilme(e):
+    global dataf
+    filmenovo = input_filme.value
     if filmenovo:
         novo_filme = pd.DataFrame({'filme': [filmenovo]})
         dataf = pd.concat([dataf, novo_filme], ignore_index=True)
-        dataf.to_excel('DBFILMES.xlsx', index=False)
+        dataf.to_excel(caminho_arquivo, index=False)  # Caminho completo
         input_filme.value = ''
         input_filme.update()
         atualizarlista()
@@ -34,11 +39,11 @@ def deletar_filmes(e):
     global dataf
     filmes_a_deletar = [cb.label for cb in checkboxes if cb.value]
     if filmes_a_deletar:
-        
         dataf = dataf[~dataf['filme'].isin(filmes_a_deletar)]
-        dataf.to_excel('DBFILMES.xlsx', index=False)
+        dataf.to_excel(caminho_arquivo, index=False)  # Caminho completo
         atualizarlista()
-
+    else:
+        print("Nenhum filme selecionado para deletar.")
 
 def atualizarlista():
     global checkboxes
@@ -48,11 +53,10 @@ def atualizarlista():
         checkbox = ft.Checkbox(label=i)
         checkboxes.append(checkbox)
         lista_filmes.controls.append(checkbox)
-    
     lista_filmes.update()
 
 def janela(page: ft.Page):
-    global resultado, input_filme, lista_filmes, dataf, checkboxes, deletados
+    global resultado, input_filme, lista_filmes, checkboxes
 
     page.appbar = ft.AppBar(
         title=ft.Text(
@@ -77,7 +81,6 @@ def janela(page: ft.Page):
     )
 
     lista_filmes = ft.Column()
-
     resultado = ft.Text('')
 
     page.title = 'Sorteador de Filmes'
@@ -92,7 +95,6 @@ def janela(page: ft.Page):
         alignment=ft.alignment.center,
         padding=50
     )
-
 
     page.add(input_container)
     page.add(lista_filmes)

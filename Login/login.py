@@ -2,9 +2,7 @@ import flet as ft
 import pandas as pd
 
 
-tchau = pd.read_excel('C:/Users/joaom/OneDrive/Área de Trabalho/pp/cadastro.xlsx', engine='openpyxl')
-
-
+#chau = pd.read_excel('C:/Users/joaom/OneDrive/Área de Trabalho/pp/cadastro.xlsx', engine='openpyxl') (por algum motivo esta com erro informando que nao esta instalado a biblioteca OpenPy ENT N SEI OQ TA ACONTECENDO )
 
 
 def main(page: ft.Page):
